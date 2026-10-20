@@ -65,6 +65,14 @@ export const lembreteDados: Lembretes = {
             corpoLembrete: 'Manutenção das unhas dia 24/11',
             statusLembrete: false,
           
+        },
+
+        {
+            lembreteId: 8,
+            tituloLembrete: 'Salão de Beleza',
+            corpoLembrete: 'Manutenção da tintura dia 24/11',
+            statusLembrete: false,
+          
         }
     ]
 }

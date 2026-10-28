@@ -1,6 +1,6 @@
 export type Lembrete = {
-    lembreteId:number,
-    tituloLembrete:string,
-    corpoLembrete:string,
-    statusLembrete:boolean    
+    LembreteId:number,
+    TituloLembrete:string,
+    CorpoLembrete:string,
+    StatusLembrete:boolean    
 }

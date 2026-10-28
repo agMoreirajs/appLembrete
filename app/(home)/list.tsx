@@ -1,6 +1,6 @@
 import { StyleSheet, FlatList, View } from 'react-native';
 import { LembreteItem } from '../../components/lembreteItem/lembreteItem';
-import { getAllLembretes } from '../../service/lembrete';
+import { getAllLembretes, getAllLembretesByAPI } from '../../service/lembrete';
 import { useEffect, useState } from 'react';
 
 export default function List() {
@@ -10,7 +10,7 @@ export default function List() {
   useEffect(() => {
     async function fetchLembretes() {
       try {
-        const data = await getAllLembretes();
+        const data = await getAllLembretesByAPI();
         setMeusLembretes(data);
       } finally {
         setLoading(false);
@@ -25,7 +25,7 @@ export default function List() {
       <FlatList
         data={meusLembretes}
         renderItem={({ item }) => <LembreteItem lembrete={item} />}
-        keyExtractor={(item) => item.lembreteId.toString()}
+        keyExtractor={(item) => item.LembreteId.toString()}
         style={styles.list}
       />
     </View>

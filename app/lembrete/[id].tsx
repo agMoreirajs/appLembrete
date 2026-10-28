@@ -3,8 +3,8 @@ import { StyleSheet, Text, SafeAreaView, View, TextInput, Switch, Alert } from '
 import React, { useEffect, useState } from 'react'
 import { Button } from '../../components/button/button'
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Lembrete } from '../../types/lembretes';
-import { getLembreteById } from '../../service/lembrete'
+import { Lembrete } from '../../types/lembrete';
+import { getLembreteById, getLembreteByIdByAPI } from '../../service/lembrete'
 import { lembreteDados } from '../../data/lembretesDados';
 
 export default function LembreteEditScreen() {
@@ -19,25 +19,28 @@ export default function LembreteEditScreen() {
     const [status, setStatus] = useState<boolean>(false);
 
     useEffect(() => {
-        if (idLembrete) {
-            const dadosLembrete = getLembreteById(idLembrete);
-            setLembrete(dadosLembrete);
-        }
-    }), [idLembrete];
-
-     useEffect(() => {
-            if (lembrete) {
-                setTitulo(lembrete.tituloLembrete || '');
-                setCorpo(lembrete.corpoLembrete || '');
-                setStatus(lembrete.statusLembrete || false);
+        async function getLembreteById(idLembrete: number) {
+            if (idLembrete) {
+                const dadosLembrete = await getLembreteByIdByAPI(idLembrete);
+                setLembrete(dadosLembrete);
             }
         }
-   ), [lembreteDados];
+
+        getLembreteById(idLembrete);
+    }, [idLembrete]);
+
+    useEffect(() => {
+        if (lembrete) {
+            setTitulo(lembrete.TituloLembrete || '');
+            setCorpo(lembrete.CorpoLembrete || '');
+            setStatus(lembrete.StatusLembrete || false);
+        }
+    }, [lembrete]);
 
 
     return (
         <View style={styles.container}>
-            <Stack.Screen options={{ title: lembrete?.tituloLembrete }} />
+            <Stack.Screen options={{ title: lembrete?.TituloLembrete }} />
             <View style={styles.lembreteArea}>
 
                 <View style={styles.detailsArea}>

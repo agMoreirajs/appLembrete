@@ -1,35 +1,51 @@
 import { lembreteDados } from "../data/lembretesDados";
+import { Lembrete } from "../types/lembrete";
 
-const URL = "http://10.59.47.30:8081/api/lembretes";
+const URL = "http://10.59.47.30/api/lembretes";
 
 export function getAllLembretes() {
     return lembreteDados.lembretes;
 }
 
-export async function getAllLembretesByAPI() {
-    try {
-        const response = await fetch(URL);
-
-        if (!response.ok) {
-            throw new Error(`Erro na requisição: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-return data.map((item: any) => ({
-    lembreteId: item.lembreteId,
-    tituloLembrete: item.tituloLembrete,
-    corpoLembrete: item.corpoLembrete,
-    statusLembrete: item.statusLembrete,
-}));
-
-    } catch (error) {
-        console.error("Erro ao buscar lembretes:", error);
-        throw error;
-    }
-}
 
 export function getLembreteById(pId: number) {
-    return lembreteDados.lembretes.find(item => item.lembreteId === pId);
+    return lembreteDados.lembretes.find(item => item.LembreteId === pId);
 }
 
+//API
+
+export async function getAllLembretesByAPI(): Promise<Lembrete[]> {
+    const response = await fetch(URL);
+    const json = await response.json();
+    console.log(json);
+    return json;
+}
+
+export async function getLembreteByIdByAPI(pId: number): Promise<Lembrete> {
+    const response = await fetch(`${URL}/${pId}`);
+    const json = await response.json();
+    console.log(json);
+    return json;
+}
+
+export async function criarLembrete(lembrete:Omit<Lembrete, 'LembreteId'>){
+    const lembreteUnico = {
+        "TituloLembrete": lembrete.TituloLembrete,
+        "CorpoLembrete": lembrete.CorpoLembrete,
+        "StatusLembrete": lembrete.StatusLembrete
+    }
+
+    const response = await fetch(URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(lembreteUnico),
+    });
+
+    if (!response.ok) {
+        throw new Error('Erro ao criar lembrete');
+    }
+    console.log(response.json);
+    return response.json();
+}

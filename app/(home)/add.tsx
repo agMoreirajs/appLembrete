@@ -2,6 +2,8 @@ import { StyleSheet, View, Text, TextInput, Switch, Alert } from 'react-native'
 import React, {useState} from 'react';
 import { router, Stack } from 'expo-router';
 import { Button } from '../../components/button/button';
+import { criarLembrete } from '../../service/lembrete';
+import { Lembrete } from '../../types/lembrete';
 
 
 
@@ -10,7 +12,24 @@ export default function Add() {
     const [titulo, setTitulo] = useState<string>('');
     const [corpo, setCorpo] = useState<string>('');
     const [status, setStatus] = useState<boolean>(false);
-   
+
+    async function handleLembreteAdd() {
+        console.log(titulo +" "+ corpo +" "+ status.toString());
+        try {
+            const novoLembrete:Omit<Lembrete, 'LembreteId'> = {
+                "TituloLembrete": titulo,
+                "CorpoLembrete": corpo,
+                "StatusLembrete": status
+            };
+            await criarLembrete(novoLembrete);
+            Alert.alert('Sucesso', 'Lembrete criado com sucesso!');
+        router.push('/(home)/list');
+        }
+        catch (error) {
+            console.error(error);
+            Alert.alert('Erro', 'Não foi possível criar o lembrete.');
+        }
+    }
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ title: "Adicionar Lembrete" }} />
@@ -50,7 +69,7 @@ export default function Add() {
                 </View>
             </View>
             <View style={styles.buttonArea}>
-                <Button title="Adicionar" onPress={alert} />
+                <Button title="Adicionar" onPress={handleLembreteAdd} />
             </View>
         </View>
     ) }

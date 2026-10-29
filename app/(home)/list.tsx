@@ -2,28 +2,23 @@ import { StyleSheet, FlatList, View } from 'react-native';
 import { LembreteItem } from '../../components/lembreteItem/lembreteItem';
 import { getAllLembretes, getAllLembretesByAPI } from '../../service/lembrete';
 import { useEffect, useState } from 'react';
+import { Lembrete } from '../../types/lembrete';
 
 export default function List() {
-  const [meusLembretes, setMeusLembretes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchLembretes() {
-      try {
-        const data = await getAllLembretesByAPI();
-        setMeusLembretes(data);
-      } finally {
-        setLoading(false);
-      }
+ const [lembretes, setLembretes] = useState<Lembrete[]>([]);
+ 
+ useEffect(() => {
+    async function getLembretesAll() {
+      const listaLembretes = await getAllLembretesByAPI();
+      setLembretes(listaLembretes);
     }
-
-    fetchLembretes();
-  }, []);
+    getLembretesAll();
+  }, [lembretes]);
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={meusLembretes}
+        data={lembretes}
         renderItem={({ item }) => <LembreteItem lembrete={item} />}
         keyExtractor={(item) => item.LembreteId.toString()}
         style={styles.list}

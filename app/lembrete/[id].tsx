@@ -6,45 +6,80 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Lembrete } from '../../types/lembrete';
 import { getLembreteById, getLembreteByIdByAPI } from '../../service/lembrete'
 import { lembreteDados } from '../../data/lembretesDados';
+import { removerLembrete, atualizarLembrete } from '../../service/lembrete';
 
 export default function LembreteEditScreen() {
-
+   
     const { id } = useLocalSearchParams();
-
+    // Acima, pegando o que vem como parametro usando o hook useLocalSearchParams = pode pegar um ou um array
     const idLembrete = parseInt(id as string);
-
+    // Acima como virá sempre um único e não um array temos que dizer que quermos pegar como uma string
+   
     const [lembrete, setLembrete] = useState<Lembrete>();
     const [titulo, setTitulo] = useState<string>('');
     const [corpo, setCorpo] = useState<string>('');
     const [status, setStatus] = useState<boolean>(false);
-
+ 
     useEffect(() => {
-        async function getLembreteById(idLembrete: number) {
-            if (idLembrete) {
-                const dadosLembrete = await getLembreteByIdByAPI(idLembrete);
-                setLembrete(dadosLembrete);
+        async function getLembreteById(idLembrete:number){
+            if (idLembrete)
+            {
+            const dadosLembrete = await getLembreteByIdByAPI(idLembrete);
+            //tratamento ao lembrete transformando o 0 e 1 que vem da api em true ou false
+            dadosLembrete.StatusLembrete=dadosLembrete.StatusLembrete.toString()==='0'?false:true;
+            setLembrete(dadosLembrete);
             }
-        }
-
+        }            
         getLembreteById(idLembrete);
     }, [idLembrete]);
-
+ 
     useEffect(() => {
         if (lembrete) {
-            setTitulo(lembrete.TituloLembrete || '');
-            setCorpo(lembrete.CorpoLembrete || '');
-            setStatus(lembrete.StatusLembrete || false);
-        }
+        setTitulo(lembrete.TituloLembrete || '');
+        setCorpo(lembrete.CorpoLembrete || '');
+        setStatus(lembrete.StatusLembrete || false);
+        }        
     }, [lembrete]);
-
-
+ 
+    //Lembrete Save
+        async function handleLembreteSave() {
+            console.log(titulo + " " + corpo + " " + status?.toString());  
+            try {
+                const novoLembrete:Lembrete= {  
+                    "LembreteId":idLembrete,        
+                    "TituloLembrete":titulo,
+                    "CorpoLembrete":corpo,
+                    "StatusLembrete":status,
+                };
+                console.log(novoLembrete);
+                await atualizarLembrete(novoLembrete);
+                Alert.alert('Sucesso', 'Lembrete salvo com sucesso!');
+                router.replace('/../(home)/list');
+            } catch (error) {
+                console.log(error);
+                Alert.alert('Erro', 'Não foi possível salvar o lembrete.');
+            }
+        };
+ 
+         async function handleLembreRemove() {
+            try {
+                await removerLembrete(idLembrete);
+                Alert.alert('Sucesso', 'Lembrete removido com sucesso!');
+                router.replace('/../(home)/list');
+            } catch (error) {
+                console.log(error);
+                Alert.alert('Erro', 'Não foi possível remover o lembrete.');
+            }
+        };
+ 
+ 
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ title: lembrete?.TituloLembrete }} />
             <View style={styles.lembreteArea}>
-
+ 
                 <View style={styles.detailsArea}>
-
+ 
                     <Text style={styles.title}>Título</Text>
                     <TextInput
                         style={styles.input}
@@ -78,12 +113,14 @@ export default function LembreteEditScreen() {
                 </View>
             </View>
             <View style={styles.buttonArea}>
-                <Button title="Salvar" onPress={alert} />
-                <Button title="Excluir" onPress={alert} />
+                <Button title="Salvar" onPress={handleLembreteSave} />
+                <Button title="Excluir" onPress={handleLembreRemove} />
             </View>
         </View>
     )
 }
+
+
 
 const styles = StyleSheet.create({
     container: {
